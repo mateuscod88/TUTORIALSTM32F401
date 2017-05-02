@@ -4,3 +4,8 @@
 
 .uvoptx
 .uvguix
+*.TMP
+*.scvd
+
+/Listings
+/Objects

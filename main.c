@@ -1,4 +1,5 @@
 #include "stm32f4xx_hal_conf.h"
+
 int main()
 {
 	RCC_OscInitTypeDef rcc_osc;
@@ -20,5 +21,5 @@ int main()
 	rcc_clock.APB2CLKDivider = RCC_HCLK_DIV2;
 	HAL_RCC_ClockConfig(&rcc_clock,FLASH_LATENCY_5);
 	
-	
+	 int sys_clock = SystemCoreClock;
 }
