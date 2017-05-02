@@ -19,4 +19,6 @@ int main()
 	rcc_clock.APB1CLKDivider = RCC_HCLK_DIV4;
 	rcc_clock.APB2CLKDivider = RCC_HCLK_DIV2;
 	HAL_RCC_ClockConfig(&rcc_clock,FLASH_LATENCY_5);
+	
+	
 }
