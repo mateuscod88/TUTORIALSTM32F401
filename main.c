@@ -1,5 +1,5 @@
 #include "stm32f4xx_hal_conf.h"
-
+#include "UART_CONFIG.h"
 int main()
 {
 	RCC_OscInitTypeDef rcc_osc;
@@ -22,4 +22,13 @@ int main()
 	HAL_RCC_ClockConfig(&rcc_clock,FLASH_LATENCY_5);
 	
 	 int sys_clock = SystemCoreClock;
+	
+	UART2_BRR = UART_MANTIASA | UART_FRACTION;
+	
+	
+}
+
+
+void USART2_IRQHandler(){
+
 }
