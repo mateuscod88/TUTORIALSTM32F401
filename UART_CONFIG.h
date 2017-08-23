@@ -10,6 +10,10 @@
 #define RCC_APB1ENR (*(unsigned int*)(0x40023840))
 #define UART2_CLOCK_ENABLE 1U << 17
 
+
+
+#define UART_WORD_8 0U << 12
+#define UART_STOP_BIT_0  0x00 << 12
 #define UART_MANTIASA 0x0222 << 4
 #define UART_FRACTION 0x0E << 0 
 
