@@ -65,8 +65,13 @@ void Uart_Transmit_Interrupt(uint8_t * pTxData, uint16_t Size)
 }
 void Uart_Handler(Uart_data * data)
 {
-	if(UART2_SR & UART_TXE_FLAG_SET && (UART2_SR & UART_TC_FLAG_SET)){
+	if(UART2_SR & UART_TXE_FLAG_SET && (UART2_SR & UART_TC_FLAG_SET)){// TC condition check
 		
+	}
+	else 
+	{
+		//TCIE oFF 
+		//Callback TX
 	}
 }
 void Send_Data(Uart_data * data)
@@ -82,6 +87,7 @@ void Send_Data(Uart_data * data)
 	}
 	return;
 }
+// send Data in pooling mode 
 void sendData( uint8_t * pTxData, uint16_t Size)
 {
 	uint16_t counter = Size;
