@@ -7,7 +7,8 @@
 #define UART2_CR1 (*(unsigned int*)(0x4000440C))
 #define UART2_CR2 (*(unsigned int*)(0x40004410))
 #define UART2_CR3 (*(unsigned int*)(0x40004414))
-
+#define RCC_APB1ENR (*(unsigned int*)(0x40023840))
+#define UART2_CLOCK_ENABLE 1U << 17
 
 #define UART_MANTIASA 0x0222 << 4
 #define UART_FRACTION 0x0E << 0 
