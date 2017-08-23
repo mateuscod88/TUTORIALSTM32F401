@@ -1,5 +1,13 @@
 #include "stm32f4xx_hal_conf.h"
 #include "UART_CONFIG.h"
+
+typedef struct UART_DATAS{
+	uint8_t * pTxBuffer;
+	uint16_t Size;
+	uint16_t SizeCounter;
+}Uart_data;
+Uart_data * data;
+void sendData( uint8_t * pTxData, uint16_t Size);
 int main()
 {
 	RCC_OscInitTypeDef rcc_osc;
@@ -34,6 +42,9 @@ int main()
 	UART2_BRR |= UART_MANTIASA | UART_FRACTION;
 	UART2_CR1 |= UART_TCIE_EN;
 	
+	uint8_t dataToSend[3]={'h','u','j'};
+	
+	
 	
 }
 
@@ -41,7 +52,36 @@ int main()
 void USART2_IRQHandler(){
 
 }
-
+void Uart_Transmit_Interrupt(uint8_t * pTxData, uint16_t Size)
+{
+	if(UART2_SR & UART_TXE_FLAG_SET)
+	{
+		data->pTxBuffer = pTxData;
+		data->Size = Size;
+		data->SizeCounter = Size;
+		UART2_CR1|= UART_TXEIE_EN;
+		return;
+	}
+}
+void Uart_Handler(Uart_data * data)
+{
+	if(UART2_SR & UART_TXE_FLAG_SET && (UART2_SR & UART_TC_FLAG_SET)){
+		
+	}
+}
+void Send_Data(Uart_data * data)
+{
+	if(UART2_SR & UART_TXE_FLAG_SET)
+	{
+		UART2_DR = (uint8_t)(*data->pTxBuffer++ & (uint8_t)0x00FFU);
+		data->SizeCounter--;
+	}
+	if(data->SizeCounter == 0)
+	{
+		UART2_CR1&= ~(UART_TXEIE_EN);
+	}
+	return;
+}
 void sendData( uint8_t * pTxData, uint16_t Size)
 {
 	uint16_t counter = Size;
@@ -49,7 +89,7 @@ void sendData( uint8_t * pTxData, uint16_t Size)
 	{
 		UART2_CR1 |= UART_TE_SET;
 		while(UART2_SR & UART_TXE_FLAG_SET);
-		UART2_DR = *pTxData;
+		UART2_DR = (uint8_t)(*pTxData++ & (uint8_t)0x00FFU);
 		pTxData++;
 		counter--;
 	}
