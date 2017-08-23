@@ -11,13 +11,18 @@
 #define UART2_CLOCK_ENABLE 1U << 17
 
 
+#define UART_UE 1U << 13
+#define UART_TE_SET 1U  << 3
+#define UART_TE_CLEAR 0U<< 3
 
-#define UART_WORD_8 0U << 12
+#define UART_WORD_8B 0U << 12
 #define UART_STOP_BIT_0  0x00 << 12
 #define UART_MANTIASA 0x0222 << 4
 #define UART_FRACTION 0x0E << 0 
 
-#define WORD_LENGHT_8B 0 << 12
+#define UART_TCIE_EN 1U << 6
+
+#define UART_TXE_FLAG_SET 1U << 7
 
 //PA2 tx  pa3 rx
 
@@ -36,6 +41,7 @@
 
 #define RCC_AHB1ENR  (*(unsigned int*)(0x40023830))
 #define GPIOA_CLOCK_ENABLE 1U << 0
+
 
 
 	

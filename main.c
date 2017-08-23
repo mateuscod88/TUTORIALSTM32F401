@@ -28,10 +28,11 @@ int main()
 	GPIOA_AFRL = PA2_AF7 | PA3_AF7;
 	
 	RCC_APB1ENR = UART2_CLOCK_ENABLE;
-	
-	UART2_CR1 = UART_WORD_8;
-	UART2_CR2 = UART_STOP_BIT_0;
-	UART2_BRR = UART_MANTIASA | UART_FRACTION;
+	UART2_CR1 |= UART_UE;
+	UART2_CR1 |= UART_WORD_8B;
+	UART2_CR2 |= UART_STOP_BIT_0;
+	UART2_BRR |= UART_MANTIASA | UART_FRACTION;
+	UART2_CR1 |= UART_TCIE_EN;
 	
 	
 }
@@ -39,4 +40,19 @@ int main()
 
 void USART2_IRQHandler(){
 
+}
+
+void sendData( uint8_t * pTxData, uint16_t Size)
+{
+	uint16_t counter = Size;
+	while(counter > 0)
+	{
+		UART2_CR1 |= UART_TE_SET;
+		while(UART2_SR & UART_TXE_FLAG_SET);
+		UART2_DR = *pTxData;
+		pTxData++;
+		counter--;
+	}
+	while(UART2_SR & UART_TC_FLAG_SET);
+	UART2_CR1 |= UART_TE_CLEAR;
 }
