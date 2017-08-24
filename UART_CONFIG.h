@@ -26,6 +26,9 @@
 #define UART_TXEIE_CLEAR ~(1U << 7)
 #define UART_TC_FLAG_SET 1U << 6
 #define UART_TXE_FLAG_SET 1U << 7
+#define UART_RXNEIE_SET 1U << 5
+#define UART_RXNEIE_CLEAR ~(1U << 5)
+#define UART_RXNE_FLAG 1U << 5
 
 //PA2 tx  pa3 rx
 

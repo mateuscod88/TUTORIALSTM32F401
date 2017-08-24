@@ -3,8 +3,10 @@
 
 typedef struct UART_DATAS{
 	uint8_t * pTxBuffer;
+	uint8_t * pRxBuffPtr;
 	uint16_t Size;
 	uint16_t SizeCounter;
+	
 }Uart_data;
 Uart_data * data;
 void sendData( uint8_t * pTxData, uint16_t Size);
@@ -67,9 +69,18 @@ void Uart_Transmit_Interrupt(uint8_t * pTxData, uint16_t Size)
 		return;
 	}
 }
+void Uart_Receive_Interrupt(uint8_t * pRxData)
+{
+	UART2_CR1 |= UART_RXNEIE_SET;
+	data->pRxBuffPtr = pRxData;
+}
 void Uart_Handler(Uart_data * data)
 {
 	//Receiver handler here 
+	if(UART2_SR & UART_RXNE_FLAG && UART2_CR1 & UART_RXNEIE_SET)
+	{
+		Receive_Data();
+	}
 	if(UART2_SR & UART_TXE_FLAG_SET && UART2_CR1 & UART_TXEIE_EN)
 	{
 		Send_Data(data);
@@ -79,6 +90,18 @@ void Uart_Handler(Uart_data * data)
 		UART2_CR1 &= UART_TCIE_CLEAR;
 		//Callback TX
 	}
+}
+void Receive_Data()
+{
+	
+	data->pRxBuffPtr++ = (uint8_t)(UART2_DR & (uint8_t)0x00FFU);
+	/*if(UART2_SR & UART_RXNE_FLAG)
+	{
+		UART2_CR1 &= UART_RXNEIE_CLEAR;
+	}
+	For future purposes
+	*/
+    
 }
 void Send_Data(Uart_data * data)
 {
