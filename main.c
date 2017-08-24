@@ -44,14 +44,18 @@ int main()
 	
 	uint8_t dataToSend[3]={'h','u','j'};
 	
+	Uart_Transmit_Interrupt(dataToSend,3);
+	
 	
 	
 }
 
 
-void USART2_IRQHandler(){
-
+void USART2_IRQHandler()
+{
+	Uart_Handler(data);
 }
+
 void Uart_Transmit_Interrupt(uint8_t * pTxData, uint16_t Size)
 {
 	if(UART2_SR & UART_TXE_FLAG_SET)
@@ -65,12 +69,14 @@ void Uart_Transmit_Interrupt(uint8_t * pTxData, uint16_t Size)
 }
 void Uart_Handler(Uart_data * data)
 {
-	if(UART2_SR & UART_TXE_FLAG_SET && (UART2_SR & UART_TC_FLAG_SET)){// TC condition check
-		
-	}
-	else 
+	//Receiver handler here 
+	if(UART2_SR & UART_TXE_FLAG_SET && UART2_CR1 & UART_TXEIE_EN)
 	{
-		//TCIE oFF 
+		Send_Data(data);
+	}
+	if(UART2_SR & UART_TC_FLAG_SET && UART2_CR1 & UART_TCIE_EN) 
+	{
+		UART2_CR1 &= UART_TCIE_CLEAR;
 		//Callback TX
 	}
 }
@@ -83,7 +89,8 @@ void Send_Data(Uart_data * data)
 	}
 	if(data->SizeCounter == 0)
 	{
-		UART2_CR1&= ~(UART_TXEIE_EN);
+		UART2_CR1 &= UART_TXEIE_CLEAR;
+		UART2_CR1 |= UART_TCIE_EN;
 	}
 	return;
 }

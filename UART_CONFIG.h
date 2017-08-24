@@ -21,7 +21,9 @@
 #define UART_FRACTION 0x0E << 0 
 
 #define UART_TCIE_EN 1U << 6
+#define UART_TCIE_CLEAR ~(1U << 6)
 #define UART_TXEIE_EN 1U << 7
+#define UART_TXEIE_CLEAR ~(1U << 7)
 #define UART_TC_FLAG_SET 1U << 6
 #define UART_TXE_FLAG_SET 1U << 7
 
