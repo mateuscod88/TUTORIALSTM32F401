@@ -9,6 +9,10 @@ typedef struct UART_DATAS{
 	
 }Uart_data;
 Uart_data * data;
+void Uart_Handler(Uart_data * data);
+void Uart_Transmit_Interrupt(uint8_t * pTxData, uint16_t Size);
+void Send_Data(Uart_data * data);
+void Receive_Data();
 void sendData( uint8_t * pTxData, uint16_t Size);
 int main()
 {
@@ -94,7 +98,8 @@ void Uart_Handler(Uart_data * data)
 void Receive_Data()
 {
 	
-	data->pRxBuffPtr++ = (uint8_t)(UART2_DR & (uint8_t)0x00FFU);
+	*data->pRxBuffPtr++ = (UART2_DR) & (uint8_t)0x00FFU;
+	//(uint8_t)((*(uint8_t)UART2_DR) & (uint8_t)0x00FFU);
 	/*if(UART2_SR & UART_RXNE_FLAG)
 	{
 		UART2_CR1 &= UART_RXNEIE_CLEAR;
