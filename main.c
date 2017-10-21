@@ -37,16 +37,16 @@ int main()
 	
 	 int sys_clock = SystemCoreClock;
 	RCC_AHB1ENR = GPIOA_CLOCK_ENABLE;
-	GPIOA_MODER = PA2_AF_TX | PA3_IO_RX;
-	GPIOA_PUPDR = PA2_PULL_UP | PA3_PULL_DOWN;
-	GPIOA_AFRL = PA2_AF7 | PA3_AF7;
+	GPIOA_MODER = PA9_AF_TX | PA10_IO_RX;
+	GPIOA_PUPDR = PA9_PULL_UP | PA10_PULL_DOWN;
+	GPIOA_AFRH = PA9_AF7 | PA9_AF7;
 	
-	RCC_APB1ENR = UART2_CLOCK_ENABLE;
-	UART2_CR1 |= UART_UE;
-	UART2_CR1 |= UART_WORD_8B;
-	UART2_CR2 |= UART_STOP_BIT_0;
-	UART2_BRR |= UART_MANTIASA | UART_FRACTION;
-	UART2_CR1 |= UART_TCIE_EN;
+	RCC_APB2ENR = UART1_CLOCK_ENABLE;
+	UART1_CR1 |= UART_UE;
+	UART1_CR1 |= UART_WORD_8B;
+	UART1_CR2 |= UART_STOP_BIT_0;
+	UART1_BRR |= UART_MANTIASA | UART_FRACTION;
+	UART1_CR1 |= UART_TCIE_EN;
 	
 	uint8_t dataToSend[3]={'h','u','j'};
 	
@@ -57,48 +57,48 @@ int main()
 }
 
 
-void USART2_IRQHandler()
+void USART1_IRQHandler()
 {
 	Uart_Handler(data);
 }
 
 void Uart_Transmit_Interrupt(uint8_t * pTxData, uint16_t Size)
 {
-	if(UART2_SR & UART_TXE_FLAG_SET)
+	if(UART1_SR & UART_TXE_FLAG_SET)
 	{
 		data->pTxBuffer = pTxData;
 		data->Size = Size;
 		data->SizeCounter = Size;
-		UART2_CR1|= UART_TXEIE_EN;
+		UART1_CR1|= UART_TXEIE_EN;
 		return;
 	}
 }
 void Uart_Receive_Interrupt(uint8_t * pRxData)
 {
-	UART2_CR1 |= UART_RXNEIE_SET;
+	UART1_CR1 |= UART_RXNEIE_SET;
 	data->pRxBuffPtr = pRxData;
 }
 void Uart_Handler(Uart_data * data)
 {
 	//Receiver handler here 
-	if(UART2_SR & UART_RXNE_FLAG && UART2_CR1 & UART_RXNEIE_SET)
+	if(UART1_SR & UART_RXNE_FLAG && UART1_CR1 & UART_RXNEIE_SET)
 	{
 		Receive_Data();
 	}
-	if(UART2_SR & UART_TXE_FLAG_SET && UART2_CR1 & UART_TXEIE_EN)
+	if(UART1_SR & UART_TXE_FLAG_SET && UART1_CR1 & UART_TXEIE_EN)
 	{
 		Send_Data(data);
 	}
-	if(UART2_SR & UART_TC_FLAG_SET && UART2_CR1 & UART_TCIE_EN) 
+	if(UART1_SR & UART_TC_FLAG_SET && UART1_CR1 & UART_TCIE_EN) 
 	{
-		UART2_CR1 &= UART_TCIE_CLEAR;
+		UART1_CR1 &= UART_TCIE_CLEAR;
 		//Callback TX
 	}
 }
 void Receive_Data()
 {
 	
-	*data->pRxBuffPtr++ = (UART2_DR) & (uint8_t)0x00FFU;
+	*data->pRxBuffPtr++ = (UART1_DR) & (uint8_t)0x00FFU;
 	//(uint8_t)((*(uint8_t)UART2_DR) & (uint8_t)0x00FFU);
 	/*if(UART2_SR & UART_RXNE_FLAG)
 	{
@@ -110,15 +110,15 @@ void Receive_Data()
 }
 void Send_Data(Uart_data * data)
 {
-	if(UART2_SR & UART_TXE_FLAG_SET)
+	if(UART1_SR & UART_TXE_FLAG_SET)
 	{
-		UART2_DR = (uint8_t)(*data->pTxBuffer++ & (uint8_t)0x00FFU);
+		UART1_DR = (uint8_t)(*data->pTxBuffer++ & (uint8_t)0x00FFU);
 		data->SizeCounter--;
 	}
 	if(data->SizeCounter == 0)
 	{
-		UART2_CR1 &= UART_TXEIE_CLEAR;
-		UART2_CR1 |= UART_TCIE_EN;
+		UART1_CR1 &= UART_TXEIE_CLEAR;
+		UART1_CR1 |= UART_TCIE_EN;
 	}
 	return;
 }
@@ -128,12 +128,12 @@ void sendData( uint8_t * pTxData, uint16_t Size)
 	uint16_t counter = Size;
 	while(counter > 0)
 	{
-		UART2_CR1 |= UART_TE_SET;
-		while(UART2_SR & UART_TXE_FLAG_SET);
-		UART2_DR = (uint8_t)(*pTxData++ & (uint8_t)0x00FFU);
+		UART1_CR1 |= UART_TE_SET;
+		while(UART1_SR & UART_TXE_FLAG_SET);
+		UART1_DR = (uint8_t)(*pTxData++ & (uint8_t)0x00FFU);
 		pTxData++;
 		counter--;
 	}
-	while(UART2_SR & UART_TC_FLAG_SET);
-	UART2_CR1 |= UART_TE_CLEAR;
+	while(UART1_SR & UART_TC_FLAG_SET);
+	UART1_CR1 |= UART_TE_CLEAR;
 }
