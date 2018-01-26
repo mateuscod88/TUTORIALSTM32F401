@@ -22,24 +22,21 @@ void Uart_Handler(volatile Uart_data * data);
 void Uart_Transmit_Interrupt(uint8_t * pTxData, uint16_t Size);
 void Send_Data(volatile Uart_data * data);
 void Receive_Data();
-void sendData( uint8_t * pTxData, uint16_t Size);
-void Exti_callback();
 void sysConfig();
 int main()
-{
-	
+{	
 	sysConfig();
 	
-	GPIO_InitTypeDef gpio_push_button;
 	__HAL_RCC_GPIOA_CLK_ENABLE();
   
   /* Configure PA0 pin as input floating */
+	GPIO_InitTypeDef gpio_push_button;
   gpio_push_button.Mode = GPIO_MODE_IT_FALLING;
   gpio_push_button.Pull = GPIO_NOPULL;
   gpio_push_button.Pin = GPIO_PIN_0;
   
-	
 	HAL_GPIO_Init(GPIOA,&gpio_push_button);
+	
 	RCC_AHB1ENR |= GPIOA_CLOCK_ENABLE;
 	GPIO_Instance * push_button = (GPIO_Instance*)GPIOA_BASE;
 	push_button->GPIOx_MODER |= PA2_AF_TX |PA3_AF_RX;
@@ -48,12 +45,23 @@ int main()
 	
 	
 	RCC_AHB1ENR |= GPIOD_CLOCK_ENABLE;
-	LEDs = (GPIO_Instance *)GPIOD_addr;
-	LEDs->GPIOx_PUPDR |= GPIOx_PUPDR_pull_up(GPIOx_PIN_12) | GPIOx_PUPDR_pull_up(GPIOx_PIN_13) | GPIOx_PUPDR_pull_up(14)| GPIOx_PUPDR_pull_up(15);
-	LEDs->GPIOx_MODER |= GPIOx_MODER_output(GPIOx_PIN_12) | GPIOx_MODER_output(GPIOx_PIN_13) | GPIOx_MODER_output(14)| GPIOx_MODER_output(15);
-	LEDs->GPIOx_TYPER &= GPIOx_TYPER_push_pull(GPIOx_PIN_12);
-	LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(GPIOx_PIN_12) | GPIOx_ODR_bit_set(GPIOx_PIN_13) | GPIOx_ODR_bit_set(14)| GPIOx_ODR_bit_set(15);
 	
+	LEDs = (GPIO_Instance *)GPIOD_addr;
+	LEDs->GPIOx_PUPDR |= GPIOx_PUPDR_pull_up(GPIOx_PIN_12) 
+										| GPIOx_PUPDR_pull_up(GPIOx_PIN_13) 
+										| GPIOx_PUPDR_pull_up(14)
+										| GPIOx_PUPDR_pull_up(15);
+	LEDs->GPIOx_MODER |= GPIOx_MODER_output(GPIOx_PIN_12) 
+										| GPIOx_MODER_output(GPIOx_PIN_13) 
+										| GPIOx_MODER_output(14)
+										| GPIOx_MODER_output(15);
+	LEDs->GPIOx_TYPER &= GPIOx_TYPER_push_pull(GPIOx_PIN_12);
+	LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(GPIOx_PIN_12) 
+									| GPIOx_ODR_bit_set(GPIOx_PIN_13) 
+									| GPIOx_ODR_bit_set(14)
+									| GPIOx_ODR_bit_set(15);
+	NVIC_SetPriority(EXTI0_IRQn,1);
+	NVIC_EnableIRQ(EXTI0_IRQn);
 	//GPIO_Instance * push_button = (GPIO_Instance*)GPIOA_BASE;
 	/*push_button->GPIOx_PUPDR |= 0U << 0;//pull down
 	push_button->GPIOx_MODER |= 0U << 0;//Input mode
@@ -70,9 +78,8 @@ int main()
 	//push_button_EXTI->EXT_FTSR |= 1U << 0;
 	
 	
-	//next step .. config NVIC  
-	NVIC_SetPriority(EXTI0_IRQn,1);
-	NVIC_EnableIRQ(EXTI0_IRQn);
+	  
+	
 	
 	 
 	RCC_APB1ENR = UART2_CLOCK_ENABLE;
@@ -84,13 +91,17 @@ int main()
 	uart1->UART_CR1 |=   UART_TE_SET;
 	NVIC_SetPriority(USART2_IRQn,4);
 	NVIC_EnableIRQ(USART2_IRQn);
+	
 	uart_lock = unlock;
-  Uart_Transmit_Interrupt(dataToSend,3U);
+  
+	Uart_Transmit_Interrupt(dataToSend,3U);
 	LEDs->GPIOx_ODR &= ~GPIOx_ODR_bit_set(13);
 	while(1){
 		delay_ms_m();
-		//Uart_Transmit_Interrupt(dataToSend,3U);
-		LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(GPIOx_PIN_12) | GPIOx_ODR_bit_set(GPIOx_PIN_13) | GPIOx_ODR_bit_set(14)| GPIOx_ODR_bit_set(15);
+		LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(GPIOx_PIN_12) 
+										| GPIOx_ODR_bit_set(GPIOx_PIN_13) 
+										| GPIOx_ODR_bit_set(14)
+										| GPIOx_ODR_bit_set(15);
 	}
 
 }
@@ -104,12 +115,10 @@ void USART2_IRQHandler()
 void EXTI0_IRQHandler(){	
 	/*while(LEDs->GPIOx_IDR & 1U << 0){}
 	 EXTI_PENDING = 1U<<0;
-		Exti_callback();*/
+	*/
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 }
-void SysTick_Handler()
-{
-}
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(uart_lock == 1){
@@ -172,7 +181,7 @@ void Receive_Data()
     
 }
 void sysConfig(){
-HAL_Init();
+	HAL_Init();
 	 __HAL_RCC_PWR_CLK_ENABLE();
   
   /* The voltage scaling allows optimizing the power consumption when the device is 
@@ -223,4 +232,10 @@ void Send_Data(volatile Uart_data * data)
 		uart_lock = unlock;
 	}
 	return;
+}
+void Gpio_Init(GPIO_Instance * gpio){
+
+}
+void SysTick_Handler()
+{
 }
