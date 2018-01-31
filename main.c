@@ -2,6 +2,7 @@
 
 #include "UART_CONFIG.h"
 #include "gpio.h"
+#include "ADC.h"
 
 typedef struct UART_DATAS{
 	uint8_t * pTxBuffer;
@@ -15,6 +16,9 @@ volatile Uart_data * data;
 enum LOCK {lock,unlock};
 enum LOCK uart_lock = lock;
 uint8_t dataToSend[3]={'h','u','j'};
+uint8_t dataToSendADC[3]={'a','d','c'};
+volatile int * dataFromADC;
+volatile int temp = 0;
 Uart_Instance * uart1;
 GPIO_Instance * LEDs;
 void delay_ms_m();
@@ -26,7 +30,7 @@ void sysConfig();
 int main()
 {	
 	sysConfig();
-	
+	dataFromADC = &temp;
 	__HAL_RCC_GPIOA_CLK_ENABLE();
   
   /* Configure PA0 pin as input floating */
@@ -82,7 +86,7 @@ int main()
 	
 	
 	 
-	RCC_APB1ENR = UART2_CLOCK_ENABLE;
+	RCC_APB1ENR |= UART2_CLOCK_ENABLE;
 	uart1 = (Uart_Instance *)UART2_BASE;
 	uart1->UART_CR1 |= UART_UE;
 	uart1->UART_CR1 |= UART_WORD_8B;
@@ -92,9 +96,31 @@ int main()
 	NVIC_SetPriority(USART2_IRQn,4);
 	NVIC_EnableIRQ(USART2_IRQn);
 	
-	uart_lock = unlock;
+	
+	
+	GPIO_InitTypeDef gpio_adc_in5;
+  gpio_adc_in5.Mode = GPIO_MODE_ANALOG;
   
+  gpio_adc_in5.Pin = GPIO_PIN_5;
+  
+	HAL_GPIO_Init(GPIOA,&gpio_adc_in5);
+	
+	RCC_APB2ENR |= ADC_CLOCK_ENABLE;
+	init_ADC();
+	//temperatureSensorOn();
+	ADC_in5on();
+	NVIC_SetPriority(ADC_IRQn,5);
+	NVIC_EnableIRQ(ADC_IRQn);
+	start_Conversion_ADC();
+	uart_lock = unlock;
+  uint8_t adc[3];
+	adc[0] = 'e';
+	int ads = *dataFromADC;
+	adc[1] = (uint8_t)*dataFromADC;
+	adc[2] = 'd';
 	Uart_Transmit_Interrupt(dataToSend,3U);
+	delay_ms_m();
+	Uart_Transmit_Interrupt(adc,3U);
 	LEDs->GPIOx_ODR &= ~GPIOx_ODR_bit_set(13);
 	while(1){
 		delay_ms_m();
@@ -111,7 +137,18 @@ void USART2_IRQHandler()
 	Uart_Handler(data);
 	NVIC_EnableIRQ(EXTI0_IRQn);
 }
-
+void ADC_IRQHandler()
+{
+	read_ADC(dataFromADC);
+	
+	
+	/*&uint8_t temp_adc[3];
+	temp_adc[0] = 'e';
+	temp_adc[1] = (uint8_t)c;
+	temp_adc[2] = 'h';
+	Uart_Transmit_Interrupt(temp_adc,2U);
+*/
+	}
 void EXTI0_IRQHandler(){	
 	/*while(LEDs->GPIOx_IDR & 1U << 0){}
 	 EXTI_PENDING = 1U<<0;
@@ -124,7 +161,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	if(uart_lock == 1){
 		LEDs->GPIOx_ODR &= ~(GPIOx_ODR_bit_set(12));
 		NVIC_DisableIRQ(EXTI0_IRQn);
-		Uart_Transmit_Interrupt(dataToSend,3U);
+		start_Conversion_ADC();
+		uint8_t  adc[3];
+		int c = *dataFromADC;
+		adc[0] = 'e';
+		adc[1] = (uint8_t)*dataFromADC;
+		adc[2] = 'd';
+		Uart_Transmit_Interrupt(adc,3U);
 	}
 	
 }
