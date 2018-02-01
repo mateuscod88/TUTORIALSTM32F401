@@ -79,6 +79,7 @@ typedef struct
 	unsigned int UART_GTPR;
 	
 }Uart_Instance;
+void uart2_config(Uart_Instance * uart);
 /*
 Uart baud rate calculation
 TxBaud = fck/(16xUARTDIV)

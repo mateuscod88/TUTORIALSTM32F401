@@ -41,6 +41,8 @@ typedef struct{
 	unsigned int SYSCFG_CMPCR;
 }SYSCFG_Instance;
 
+#define EXTI_FALLING_EDGE 1U << 0
+#define EXTI_GPIOA_0_INTERRUPT 1U << 0
 #define EXTI_addr (unsigned int *) 0x40013C00
 typedef struct{
 	unsigned int EXT_IMR;
@@ -50,4 +52,7 @@ typedef struct{
 	unsigned int EXT_SWIER;
 	unsigned int EXT_PR;
 }EXTI_Instance;
+void gpio_0_falling_edge();
+void gpio_uart2_config();
+void leds_On(GPIO_Instance * LEDs);
 #endif 

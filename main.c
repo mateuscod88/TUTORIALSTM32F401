@@ -31,78 +31,27 @@ int main()
 {	
 	sysConfig();
 	dataFromADC = &temp;
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-  
-  /* Configure PA0 pin as input floating */
-	GPIO_InitTypeDef gpio_push_button;
-  gpio_push_button.Mode = GPIO_MODE_IT_FALLING;
-  gpio_push_button.Pull = GPIO_NOPULL;
-  gpio_push_button.Pin = GPIO_PIN_0;
-  
-	HAL_GPIO_Init(GPIOA,&gpio_push_button);
 	
 	RCC_AHB1ENR |= GPIOA_CLOCK_ENABLE;
-	GPIO_Instance * push_button = (GPIO_Instance*)GPIOA_BASE;
-	push_button->GPIOx_MODER |= PA2_AF_TX |PA3_AF_RX;
-	push_button->GPIOx_SPEED |= 2U << 4 | 2U << 6;
-	push_button->GPIOx_AFRL |= PA2_AF7 | PA3_AF7;
-	
-	
-	RCC_AHB1ENR |= GPIOD_CLOCK_ENABLE;
-	
-	LEDs = (GPIO_Instance *)GPIOD_addr;
-	LEDs->GPIOx_PUPDR |= GPIOx_PUPDR_pull_up(GPIOx_PIN_12) 
-										| GPIOx_PUPDR_pull_up(GPIOx_PIN_13) 
-										| GPIOx_PUPDR_pull_up(14)
-										| GPIOx_PUPDR_pull_up(15);
-	LEDs->GPIOx_MODER |= GPIOx_MODER_output(GPIOx_PIN_12) 
-										| GPIOx_MODER_output(GPIOx_PIN_13) 
-										| GPIOx_MODER_output(14)
-										| GPIOx_MODER_output(15);
-	LEDs->GPIOx_TYPER &= GPIOx_TYPER_push_pull(GPIOx_PIN_12);
-	LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(GPIOx_PIN_12) 
-									| GPIOx_ODR_bit_set(GPIOx_PIN_13) 
-									| GPIOx_ODR_bit_set(14)
-									| GPIOx_ODR_bit_set(15);
+	gpio_0_falling_edge();
 	NVIC_SetPriority(EXTI0_IRQn,1);
 	NVIC_EnableIRQ(EXTI0_IRQn);
-	//GPIO_Instance * push_button = (GPIO_Instance*)GPIOA_BASE;
-	/*push_button->GPIOx_PUPDR |= 0U << 0;//pull down
-	push_button->GPIOx_MODER |= 0U << 0;//Input mode
-	push_button->GPIOx_TYPER |= 0U << 0;//Push pull output type
 	
-	RCC_APB2ENR |= SYSCFG_CLCK_ENABLE;
-	SYSCFG_Instance * push_button_SYSCFG = (SYSCFG_Instance * )SYSCFG_addr;
-	push_button_SYSCFG->SYSCFG_EXTICR1 |= 0x0000 << 0;
+	gpio_uart2_config();
 	
-	EXTI_Instance * push_button_EXTI = (EXTI_Instance * )EXTI_addr;
-	push_button_EXTI->EXT_IMR |= 1U << 0; // interrupt masked
-	push_button_EXTI->EXT_RTSR |= 1U << 0;
-	*/
-	//push_button_EXTI->EXT_FTSR |= 1U << 0;
+	RCC_AHB1ENR |= GPIOD_CLOCK_ENABLE;
+	LEDs = (GPIO_Instance *)GPIOD_addr;
+	leds_On(LEDs);
 	
-	
-	  
-	
-	
-	 
 	RCC_APB1ENR |= UART2_CLOCK_ENABLE;
 	uart1 = (Uart_Instance *)UART2_BASE;
-	uart1->UART_CR1 |= UART_UE;
-	uart1->UART_CR1 |= UART_WORD_8B;
-	uart1->UART_CR2 |= UART_STOP_BIT_0;
-	uart1->UART_BRR |= UART_MANTIASA | UART_FRACTION;
-	uart1->UART_CR1 |=   UART_TE_SET;
+	uart2_config(uart1);
 	NVIC_SetPriority(USART2_IRQn,4);
 	NVIC_EnableIRQ(USART2_IRQn);
 	
-	
-	
 	GPIO_InitTypeDef gpio_adc_in5;
   gpio_adc_in5.Mode = GPIO_MODE_ANALOG;
-  
   gpio_adc_in5.Pin = GPIO_PIN_5;
-  
 	HAL_GPIO_Init(GPIOA,&gpio_adc_in5);
 	
 	RCC_APB2ENR |= ADC_CLOCK_ENABLE;
@@ -111,6 +60,7 @@ int main()
 	ADC_in5on();
 	NVIC_SetPriority(ADC_IRQn,5);
 	NVIC_EnableIRQ(ADC_IRQn);
+	
 	start_Conversion_ADC();
 	uart_lock = unlock;
   uint8_t adc[3];

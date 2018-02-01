@@ -390,6 +390,16 @@
               <FileType>1</FileType>
               <FilePath>.\ADC.c</FilePath>
             </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart_config.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\uart_config.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
