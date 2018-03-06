@@ -400,6 +400,11 @@
               <FileType>1</FileType>
               <FilePath>.\uart_config.c</FilePath>
             </File>
+            <File>
+              <FileName>SPI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SPI.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -414,6 +419,11 @@
               <FileName>UART_CONFIG.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\UART_CONFIG.h</FilePath>
+            </File>
+            <File>
+              <FileName>SPI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SPI.h</FilePath>
             </File>
           </Files>
         </Group>
