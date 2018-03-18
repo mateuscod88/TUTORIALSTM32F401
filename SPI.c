@@ -29,10 +29,27 @@ PE3 CS
 	spi_instance->SPI_CR1 &= CPHA_RESET;
 	spi_instance->SPI_CR1 &= SPI1_DFF_8B;
 	spi_instance->SPI_CR1 &= SPI1_LSBFIRST;
+	spi_instance->SPI_CR1 &= SPI1_SSM;
 	spi_instance->SPI_CR1 |= SPI1_SPE_EN;
-	
+//mstr bit
 	
 } 
+void SPI_Send(SPI_Data * data){
+	SPI_INSTANCE * spi_instance = (SPI_INSTANCE*)SPI1_addr;
+	GPIO_Instance * spi_pin_cs = (GPIO_Instance*)GPIOE_addr;
+	if(spi_instance->SPI_SR & SPI_TXE_SET){
+		spi_pin_cs->GPIOx_ODR &= GPIO_CS_LOW;
+		spi_instance->SPI_DR = (uint8_t)(*data->ptTxBuffer++ & (uint8_t)0x00FFU);
+	}
+}
+
+void SPI_Read(){
+	SPI_INSTANCE * spi_instance = (SPI_INSTANCE*)SPI1_addr;
+	if(spi_instance->SPI_SR & SPI_RXNE_SET)
+	{
+	
+	}
+}
 void gpio_spi_config(){
 	GPIO_Instance * spi_pin = (GPIO_Instance*)GPIOA_addr;
 	GPIO_Instance * spi_pin_cs = (GPIO_Instance*)GPIOE_addr;
