@@ -21,7 +21,9 @@ PE3 CS
 #define SPI1_DFF_8B ~(1U << 11)
 #define SPI1_LSBFIRST  ~(1U << 7)
 #define SPI1_SPE_EN  1U << 6
-#define SPI1_SSM ~(1 << 9)
+#define SPI1_SPE_DIS  ~(1U << 6)
+#define SPI1_SSM ~(1U << 9)
+#define SPI1_MSTR 1U << 2
 #define SPI_RXNE_SET 1U << 0
 #define SPI_TXE_SET 1U << 1
 #define GPIO_CS_LOW ~(1U << 3)
@@ -46,6 +48,7 @@ typedef struct{
 
 void SPI_Init();
 void SPI_Send(SPI_Data * data);
-void SPI_Read();
+void SPI_Read(SPI_Data * data);
+void gpio_spi_config();
 
 #endif

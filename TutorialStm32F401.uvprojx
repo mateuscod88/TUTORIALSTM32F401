@@ -435,6 +435,11 @@
               <FileType>5</FileType>
               <FilePath>.\rcc.h</FilePath>
             </File>
+            <File>
+              <FileName>MEMS.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\MEMS.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

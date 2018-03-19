@@ -1,6 +1,5 @@
 #include "SPI.h"
 #include "gpio.h"
-void SPI_Init(){
 	/*
 	CONFIG
 	
@@ -20,7 +19,7 @@ PA7 MOSI
 PE3 CS
 
 */
-	
+void SPI_Init(){
 	RCC_APB2_EN |=  SPI1_CLOCK_EN;
 	SPI_INSTANCE * spi_instance = (SPI_INSTANCE*)SPI1_addr;
 	
@@ -30,8 +29,8 @@ PE3 CS
 	spi_instance->SPI_CR1 &= SPI1_DFF_8B;
 	spi_instance->SPI_CR1 &= SPI1_LSBFIRST;
 	spi_instance->SPI_CR1 &= SPI1_SSM;
+	spi_instance->SPI_CR1 |= SPI1_MSTR;
 	spi_instance->SPI_CR1 |= SPI1_SPE_EN;
-//mstr bit
 	
 } 
 void SPI_Send(SPI_Data * data){
@@ -40,14 +39,18 @@ void SPI_Send(SPI_Data * data){
 	if(spi_instance->SPI_SR & SPI_TXE_SET){
 		spi_pin_cs->GPIOx_ODR &= GPIO_CS_LOW;
 		spi_instance->SPI_DR = (uint8_t)(*data->ptTxBuffer++ & (uint8_t)0x00FFU);
+		data->SizeCounter--;
+	}
+	if(data->SizeCounter == 0){
+		spi_instance->SPI_CR1 &= SPI1_SPE_DIS;
 	}
 }
 
-void SPI_Read(){
+void SPI_Read(SPI_Data * data){
 	SPI_INSTANCE * spi_instance = (SPI_INSTANCE*)SPI1_addr;
 	if(spi_instance->SPI_SR & SPI_RXNE_SET)
 	{
-	
+		*data->ptRxBuffer++ = (uint8_t)spi_instance->SPI_DR; 
 	}
 }
 void gpio_spi_config(){

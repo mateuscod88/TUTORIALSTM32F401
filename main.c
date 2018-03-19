@@ -3,6 +3,7 @@
 #include "UART_CONFIG.h"
 #include "gpio.h"
 #include "ADC.h"
+#include "SPI.h"
 
 typedef struct UART_DATAS{
 	uint8_t * pTxBuffer;
@@ -11,6 +12,7 @@ typedef struct UART_DATAS{
 	volatile uint16_t SizeCounter;
 	
 }Uart_data;
+SPI_Data spi_data;
 Uart_data dataA;
 volatile Uart_data * data;
 enum LOCK {lock,unlock};
@@ -72,12 +74,16 @@ int main()
 	delay_ms_m();
 	Uart_Transmit_Interrupt(adc,3U);
 	LEDs->GPIOx_ODR &= ~GPIOx_ODR_bit_set(13);
+	gpio_spi_config();
+	SPI_Init();
 	while(1){
+		SPI_Send();
 		delay_ms_m();
 		LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(GPIOx_PIN_12) 
 										| GPIOx_ODR_bit_set(GPIOx_PIN_13) 
 										| GPIOx_ODR_bit_set(14)
 										| GPIOx_ODR_bit_set(15);
+		SPI_Read();
 	}
 
 }
