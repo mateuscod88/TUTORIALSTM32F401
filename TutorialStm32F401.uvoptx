@@ -156,22 +156,32 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SystemCoreClock,0x0A</ItemText>
+          <ItemText>spi_data.ptTxBuffer</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>dataA[i],0x0A</ItemText>
+          <ItemText>tx_bfr</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>dataFromADC,0x10</ItemText>
+          <ItemText>pTxData</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ads</ItemText>
+          <ItemText>rx_bfr</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pTxData</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pData</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -241,24 +251,24 @@
           <WinId>35897</WinId>
         </Entry>
         <Entry>
-          <Name>System Viewer\EXTI</Name>
-          <WinId>35902</WinId>
-        </Entry>
-        <Entry>
           <Name>System Viewer\GPIOA</Name>
-          <WinId>35903</WinId>
-        </Entry>
-        <Entry>
-          <Name>System Viewer\GPIOD</Name>
           <WinId>35901</WinId>
         </Entry>
         <Entry>
-          <Name>System Viewer\NVIC</Name>
-          <WinId>35905</WinId>
+          <Name>System Viewer\GPIOE</Name>
+          <WinId>35899</WinId>
         </Entry>
         <Entry>
-          <Name>System Viewer\SYSCFG</Name>
-          <WinId>35904</WinId>
+          <Name>System Viewer\RCC</Name>
+          <WinId>35896</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\SPI1</Name>
+          <WinId>35900</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\USART2</Name>
+          <WinId>35905</WinId>
         </Entry>
       </SystemViewers>
       <DebugDescription>

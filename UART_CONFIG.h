@@ -24,6 +24,7 @@
 	
 #define UART_UE 1U << 13
 #define UART_TE_SET 1U  << 3
+#define UART_RE_SET 1U << 2
 #define UART_TE_CLEAR 0U<< 3
 
 #define UART_WORD_8B 0U << 12

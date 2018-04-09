@@ -13,6 +13,13 @@
 #define GPIOx_TYPER_push_pull(pin) ~(1U << pin)
 #define GPIOx_PIN_12  12
 #define GPIOx_PIN_13  13
+#define GPIOx_PIN_14  14
+#define GPIOx_PIN_15  15
+
+#define GREEN_LED_ON GPIOx_PIN_12
+#define ORANGE_LED_ON GPIOx_PIN_13
+#define RED_LED_ON GPIOx_PIN_14
+#define BLUE_LED_ON GPIOx_PIN_15
 #define GPIOx_ODR_bit_set(pin) 1U << pin
 
 #define GPIO_AF5_AFRL  
@@ -38,15 +45,19 @@
 #define GPIO_PULL_UP_PIN_6 12
 #define GPIO_PULL_UP_PIN_7 14
 
+#define GPIO_PULL_UP_PIN_31 1U << 6
+#define GPIO_PULL_UP_PIN_51 1U << 10
+#define GPIO_PULL_UP_PIN_61 1U << 12
+#define GPIO_PULL_UP_PIN_71 1U << 14
 
-#define GPIO_MODER(x) 1U << x
+#define GPIO_MODER(x) 2U << x
 #define GPIO_SPEED_FAST(x) 2U << x
 #define GPIO_AFRL(x) 5U << x
 #define GPIO_PULL_UP(x) 1U << x
 
 #define RCC_AHB1ENR  (*(unsigned int*)(0x40023830))
-#define GPIOE_CLOCK 5
-#define GPIOA_CLOCK 1
+#define GPIOE_CLOCK 1U << 4
+#define GPIOA_CLOCK 1U << 1
 
 typedef struct{
 	unsigned int GPIOx_MODER;
