@@ -16,10 +16,12 @@ PE3 CS
 #define CPOL_SET 1U << 1  //Idle High
 #define CPOL_RESET ~(1U << 1)
 #define CPHA_RESET  ~(1U << 0) // First Edge
+#define CPHA_SET 1U << 0
 #define RCC_APB2_EN   (*(unsigned int*)(0x40023844))
 #define SPI1_CLOCK_EN 1U << 12
 #define SPI1_BR  7U << 3
 #define SPI1_DFF_8B ~(1U << 11)
+#define SPI1_DFF_16B 1U << 11
 #define SPI1_MSBFIRST  ~(1U << 7)
 #define SPI1_LSBFIRST  1U << 7
 #define SPI1_SPE_EN  1U << 6
@@ -44,7 +46,7 @@ typedef struct{
 }SPI_INSTANCE;
 
 typedef struct{
-	uint8_t *ptTxBuffer;
+	uint16_t *ptTxBuffer;
 	uint8_t *ptRxBuffer;
 	uint16_t Size;
 	uint16_t SizeCounter;

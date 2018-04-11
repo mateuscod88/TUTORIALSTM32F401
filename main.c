@@ -10,7 +10,7 @@
 
 /* Exported macro ------------------------------------------------------------*/
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
-uint8_t aTxBuffer[] = " ";
+uint8_t aTxBuffer[] = "  ";
 
 /* Buffer used for reception */
 uint8_t aRxBuffer[BUFFERSIZE];
@@ -22,7 +22,7 @@ typedef struct UART_DATAS{
 	
 }Uart_data;
 uint8_t rx_bfr[10];
-uint8_t tx_bfr[10];
+uint16_t tx_bfr[10];
 SPI_Data * ptr_spi_data;
 SPI_Data spi_data;
 Uart_data dataA;
@@ -93,13 +93,8 @@ int main()
 	SPI_Init();
 	
 	aTxBuffer[0] = READ_FROM_ONE(WHO_AM_I_REG);
-	tx_bfr[0] = READ_FROM_ONE(WHO_AM_I_REG);
-	tx_bfr[1] ='m';
-	tx_bfr[2] ='a';
-	tx_bfr[3] ='l';
-	rx_bfr[0] = 't';
-	rx_bfr[1] = 'h';
-	rx_bfr[2] = 'r';
+	tx_bfr[0] = READ_FROM_ONE(WHO_AM_I_REG)<< 8 | 0x00<<0;
+	tx_bfr[1] = 0x00;
 	//SPI Data INIT
 	spi_data.ptTxBuffer = tx_bfr;
 	spi_data.ptRxBuffer = rx_bfr;
@@ -110,14 +105,21 @@ int main()
 	while(1){
 		
 		SPI_Send(ptr_spi_data);
-		
+		SPI_Read(ptr_spi_data);
+		spi_data.ptTxBuffer = tx_bfr;
+		spi_data.ptRxBuffer = rx_bfr;
+		spi_data.Size = 2;
+		spi_data.SizeCounter = 2;
+		ptr_spi_data = &spi_data;
+	
 		delay_ms_m();
 		
-		LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(GREEN_LED_ON) ;
-		LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(ORANGE_LED_ON) ;
-		LEDs->GPIOx_ODR	|= GPIOx_ODR_bit_set(RED_LED_ON);
-		
-	  //Uart_Transmit_Interrupt(ptr_spi_data->ptRxBuffer,1U);
+		//LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(GREEN_LED_ON) ;
+		//LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(ORANGE_LED_ON) ;
+		//LEDs->GPIOx_ODR	|= GPIOx_ODR_bit_set(RED_LED_ON);
+		LEDs->GPIOx_ODR &= ~(GPIOx_ODR_bit_set(BLUE_LED_ON));
+	  LEDs->GPIOx_ODR &= ~(GPIOx_ODR_bit_set(GREEN_LED_ON));
+	  Uart_Transmit_Interrupt(ptr_spi_data->ptRxBuffer,1U);
 		
 		delay_ms_m();
 	}
@@ -126,7 +128,7 @@ int main()
 
 void USART2_IRQHandler()
 {
-	LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(BLUE_LED_ON);
+	//LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(BLUE_LED_ON);
 	//LEDs->GPIOx_ODR &= ~(GPIOx_ODR_bit_set(BLUE_LED_ON));
 	Uart_Handler(data);
 	NVIC_EnableIRQ(EXTI0_IRQn);
@@ -187,11 +189,12 @@ void Uart_Receive_Interrupt(uint8_t * pRxData)
 }
 void Uart_Handler(volatile Uart_data * data)
 {
-	LEDs->GPIOx_ODR &= ~(GPIOx_ODR_bit_set(BLUE_LED_ON));
+	//LEDs->GPIOx_ODR &= ~(GPIOx_ODR_bit_set(BLUE_LED_ON));
+	//LEDs->GPIOx_ODR &= ~(GPIOx_ODR_bit_set(GREEN_LED_ON));
 	//Receiver handler here 
 	if(uart1->UART_SR & UART_RXNE_FLAG && uart1->UART_CR1 & UART_RXNEIE_SET)
 	{
-		LEDs->GPIOx_ODR &= ~(GPIOx_ODR_bit_set(GREEN_LED_ON));
+		//LEDs->GPIOx_ODR &= ~(GPIOx_ODR_bit_set(GREEN_LED_ON));
 		Receive_Data(data);
 	}
 	if(uart1->UART_SR & UART_TXE_FLAG_SET && uart1->UART_CR1 & UART_TXEIE_EN)

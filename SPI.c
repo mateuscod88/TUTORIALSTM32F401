@@ -25,8 +25,8 @@ void SPI_Init(){
 	
 	spi_instance->SPI_CR1 |= SPI1_BR;
 	spi_instance->SPI_CR1 |= CPOL_SET;
-	spi_instance->SPI_CR1 &= CPHA_RESET;
-	spi_instance->SPI_CR1 &= SPI1_DFF_8B;
+	spi_instance->SPI_CR1 |= CPHA_SET;
+	spi_instance->SPI_CR1 |= SPI1_DFF_16B;
 	spi_instance->SPI_CR1 &= SPI1_MSBFIRST;
 	spi_instance->SPI_CR1 |= SPI1_SSM;
 	spi_instance->SPI_CR1 |= SPI1_SSI;
@@ -39,25 +39,12 @@ void SPI_Send(SPI_Data * data){
 	SPI_INSTANCE * spi_instance = (SPI_INSTANCE*)SPI1_addr;
 	GPIO_Instance * spi_pin_cs = (GPIO_Instance*)GPIOE_addr;
 	GPIO_Instance * LEDs = (GPIO_Instance *)GPIOD_addr;
-	if(data->SizeCounter == 0){
-		spi_instance->SPI_CR1 &= SPI1_SPE_DIS;
-	}
-	if(spi_instance->SPI_SR & SPI_TXE_SET){
-		spi_pin_cs->GPIOx_BSRR |= GPIO_CS_LOW;
-		spi_instance->SPI_DR = (uint8_t)(*data->ptTxBuffer & (uint8_t)0x00FFU);
-		
-		
-	}
-	uint8_t counter = 0;
 	
-	while(spi_instance->SPI_SR & SPI_RXNE_SET && counter != 255)
-	{
-		counter++;
-		LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(15);
-	}
-	LEDs->GPIOx_ODR &= ~GPIOx_ODR_bit_set(15);
-		*data->ptRxBuffer = (uint8_t)spi_instance->SPI_DR; 
-	spi_pin_cs->GPIOx_BSRR |= GPIO_CS_HIGH;
+	spi_pin_cs->GPIOx_BSRR |= GPIO_CS_LOW;
+	while((spi_instance->SPI_SR & SPI_TXE_SET)!= 0x02){}
+	spi_instance->SPI_DR = (uint16_t)(*data->ptTxBuffer & (uint16_t)0xFFFFU);
+		
+	
 	
 	
 }
@@ -67,12 +54,17 @@ void SPI_Read(SPI_Data * data){
 	GPIO_Instance * spi_pin_cs = (GPIO_Instance*)GPIOE_addr;
 	GPIO_Instance * LEDs = (GPIO_Instance *)GPIOD_addr;
 	
-	if(spi_instance->SPI_SR & SPI_RXNE_SET)
+	while((spi_instance->SPI_SR & SPI_RXNE_SET)!=0x01)
 	{
-		LEDs->GPIOx_ODR |= GPIOx_ODR_bit_set(15);
-		*data->ptRxBuffer = (uint8_t)spi_instance->SPI_DR; 
+		
 	}
 	spi_pin_cs->GPIOx_BSRR |= GPIO_CS_HIGH;
+	*data->ptRxBuffer = (uint8_t)spi_instance->SPI_DR; 
+	//spi_pin_cs->GPIOx_BSRR |= GPIO_CS_HIGH;
+	if(*data->ptRxBuffer == 0xD4){
+				LEDs->GPIOx_ODR	|= GPIOx_ODR_bit_set(BLUE_LED_ON);
+			}
+	
 }
 void gpio_spi_config(){
 	GPIO_Instance * spi_pin = (GPIO_Instance*)GPIOA_addr;
@@ -100,7 +92,7 @@ void gpio_spi_config(){
 	spi_pin->GPIOx_MODER |= GPIO_MODER(GPIO_MODER_PIN_6);
 	spi_pin->GPIOx_SPEED |= GPIO_SPEED_FAST(GPIO_SPEED_PIN_6);
 	spi_pin->GPIOx_AFRL |= GPIO_AFRL(GPIO_AFRL_PIN_6);
-	spi_pin->GPIOx_PUPDR |= 1U << 12;
+  spi_pin->GPIOx_PUPDR |= 1U << 12;
 	
 	//CS
 	spi_pin_cs->GPIOx_PUPDR &= ~(3U << 6);
